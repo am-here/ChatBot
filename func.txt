@@ -1,6 +1,6 @@
-// // import { StatusBar } from "expo-status-bar";
+import React, { useState, useCallback } from "react";
+// import { StatusBar } from "expo-status-bar";
 import { StyleSheet, SafeAreaView, Text, View } from "react-native";
-import React, { Component } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import axios from "axios";
 
@@ -12,7 +12,7 @@ const BOT = {
   avatar: BOT_avatar,
 };
 
-class App extends Component {
+/* class App extends Component {
   state = {
     messages: [
       {
@@ -84,6 +84,12 @@ class App extends Component {
       messages: GiftedChat.append(previousState.messages, quickreply),
     }));
     let message = quickreply[0].value;
+    requestQuery(
+      message,
+      // (result) => this.handleGoogleResponse(result),
+      (result) => console.log(result),
+      (error) => console.log(error)
+    );
   }
 
   render() {
@@ -98,8 +104,8 @@ class App extends Component {
       </View>
     );
   }
-}
-export default App;
+}*/
+// export default App;
 
 // export default function App() {
 //   return (
@@ -118,3 +124,81 @@ export default App;
 //     justifyContent: "center",
 //   },
 // });
+
+const App = () => {
+  const [messages, setMessages] = useState([
+    {
+      _id: 2,
+      text: "Haha!! Just Joking! How can I help you?",
+      createdAt: new Date(),
+      user: BOT,
+    },
+    {
+      _id: 1,
+      text: "Parampara, Pratishtha, Anushasan",
+      createdAt: new Date(),
+      user: BOT,
+    },
+  ]);
+  const [res, setRes] = useState("");
+
+  const handleResponse = (result) => {
+    const FormData = global.FormData;
+    const formData = new FormData();
+    formData.append("msg", result);
+    axios({
+      url: "https://sih-dialog-flow.herokuapp.com/",
+      method: "POST",
+      data: formData,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        Authorization: "Basic YnJva2VyOmJyb2tlcl8xMjM=",
+      },
+    })
+      .then(({ data }) => {
+        setRes(data);
+        sendBotResponse(res);
+      })
+      .catch((error) => {
+        console.log("error:", error);
+        return;
+      });
+  };
+  const sendBotResponse = (data) => {
+    console.log(data);
+    let message = {
+      _id: messages.length + 1,
+      data,
+      createdAt: new Date(),
+      user: BOT,
+    };
+    setMessages((prev) => GiftedChat.append(prev, [message]));
+  };
+
+  const onSend = useCallback((messages = []) => {
+    setMessages((prev) => GiftedChat.append(prev, messages));
+    console.log(messages);
+    let message = messages[0].text;
+    console.log(message);
+    handleResponse(message);
+  }, []);
+  const onQuickReply = (quickreply) => {
+    setMessages((prev) => GiftedChat.append(prev, quickreply));
+    let message = quickreply[0].value;
+    console.log(message);
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <GiftedChat
+        messages={messages}
+        onSend={(messages) => onSend(messages)}
+        onQuickReply={(quickreply) => onQuickReply(quickreply)}
+        user={{ _id: 1 }}
+      />
+    </View>
+  );
+};
+
+export default App;
