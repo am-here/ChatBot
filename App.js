@@ -12,7 +12,7 @@ const BOT = {
   avatar: BOT_avatar,
 };
 
-let textyy = "BOTY";
+let textyy = "";
 
 class App extends Component {
   state = {
@@ -32,7 +32,6 @@ class App extends Component {
     ],
     id: 1,
     name: "",
-    texty: "BOT",
   };
 
   async handleResponse(result) {
