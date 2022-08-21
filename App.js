@@ -35,35 +35,30 @@ class App extends Component {
     texty: "BOT",
   };
 
-  handleResponse(result) {
-    (async () => {
-      const FormData = global.FormData;
-      const formData = new FormData();
-      formData.append("msg", result);
-      axios({
-        url: "https://sih-dialog-flow.herokuapp.com/",
-        method: "POST",
-        data: formData,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "multipart/form-data",
-          Authorization: "Basic YnJva2VyOmJyb2tlcl8xMjM=",
-        },
+  async handleResponse(result) {
+    const FormData = global.FormData;
+    const formData = new FormData();
+    formData.append("msg", result);
+    await axios({
+      url: "https://sih-dialog-flow.herokuapp.com/",
+      method: "POST",
+      data: formData,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        Authorization: "Basic YnJva2VyOmJyb2tlcl8xMjM=",
+      },
+    })
+      .then(function (response) {
+        textyy = response.data;
       })
-        .then(function (response) {
-          console.log(response.data);
-          textyy = response.data;
-        })
-        .catch(function (error) {
-          console.log("error:", error);
-        });
-    })();
-
+      .catch(function (error) {
+        console.log("error:", error);
+      });
     this.sendBotResponse(textyy);
   }
 
   sendBotResponse(text) {
-    console.log(text);
     let message = {
       _id: this.state.messages.length + 1,
       text,
@@ -80,7 +75,6 @@ class App extends Component {
       messages: GiftedChat.append(previousState.messages, messages),
     }));
     let message = messages[0].text;
-    console.log(message);
     this.handleResponse(message);
   }
 
