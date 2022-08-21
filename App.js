@@ -12,6 +12,8 @@ const BOT = {
   avatar: BOT_avatar,
 };
 
+let textyy = "BOTY";
+
 class App extends Component {
   state = {
     messages: [
@@ -30,31 +32,34 @@ class App extends Component {
     ],
     id: 1,
     name: "",
-    texty: "",
+    texty: "BOT",
   };
 
   handleResponse(result) {
-    const FormData = global.FormData;
-    const formData = new FormData();
-    formData.append("msg", result);
-    axios({
-      url: "https://sih-dialog-flow.herokuapp.com/",
-      method: "POST",
-      data: formData,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "multipart/form-data",
-        Authorization: "Basic YnJva2VyOmJyb2tlcl8xMjM=",
-      },
-    })
-      .then(function (response) {
-        this.setState({ texty: response.data });
+    (async () => {
+      const FormData = global.FormData;
+      const formData = new FormData();
+      formData.append("msg", result);
+      axios({
+        url: "https://sih-dialog-flow.herokuapp.com/",
+        method: "POST",
+        data: formData,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data",
+          Authorization: "Basic YnJva2VyOmJyb2tlcl8xMjM=",
+        },
       })
-      .catch(function (error) {
-        console.log("error:", error);
-      });
+        .then(function (response) {
+          console.log(response.data);
+          textyy = response.data;
+        })
+        .catch(function (error) {
+          console.log("error:", error);
+        });
+    })();
 
-    this.sendBotResponse(this.state.texty);
+    this.sendBotResponse(textyy);
   }
 
   sendBotResponse(text) {
